@@ -44,7 +44,7 @@ const ItemSelector = ({ selection }) => {
     }
 
     const getMenus = () => {
-        const displayItems = items.slice(0, 5)
+        const displayItems = items?.slice(0, 5)
         return <ContentMenuGroup items={displayItems} addItem={addItem} />
     }
 

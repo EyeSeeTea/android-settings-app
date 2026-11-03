@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-09-09T09:26:54.166Z\n"
-"PO-Revision-Date: 2026-09-09T09:26:54.167Z\n"
+"POT-Creation-Date: 2026-10-28T13:01:59.115Z\n"
+"PO-Revision-Date: 2026-10-28T13:01:59.115Z\n"
 
 msgid ""
 "The initial configuration of the app has been completed and it is now ready "
@@ -1226,6 +1226,12 @@ msgstr "Global sync settings"
 
 msgid "Maximum quality images"
 msgstr "Maximum quality images"
+
+msgid "Only applicable for users using Android app version 3.5 or later."
+msgstr "Only applicable for users using Android app version 3.5 or later."
+
+msgid "3.5 +"
+msgstr "3.5 +"
 
 msgid ""
 "Images compress to medium quality by default. Add items here that should be "

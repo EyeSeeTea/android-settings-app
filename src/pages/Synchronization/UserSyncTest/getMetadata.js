@@ -1,3 +1,4 @@
+import chunk from 'lodash/chunk'
 import { formatByteSize, getByteLength } from '../../../utils/getByteLength'
 import { promiseAllInBatches } from '../../../utils/promiseAllInBatches'
 import { joinElementsById, joinObjectsById } from './helper'
@@ -98,6 +99,7 @@ const fetchOrgUnits = (dataEngine, orgUnitList) =>
     promiseAllInBatches(orgUnitList, (ou) => apiFetchOrgUnit(dataEngine, ou))
 
 const fetchDataElements = (dataEngine, dataElementList) =>
-    promiseAllInBatches(dataElementList, (e) =>
-        apiFetchDataElements(dataEngine, e)
+    promiseAllInBatches(
+        chunk(dataElementList, DATA_ELEMENTS_PER_REQUEST),
+        (dataElements) => apiFetchDataElements(dataEngine, dataElements)
     )

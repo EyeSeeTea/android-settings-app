@@ -1,5 +1,6 @@
 import toArray from 'lodash/toArray'
 import { formatByteSize, getByteLength } from '../../../utils/getByteLength'
+import { promiseAllInBatches } from '../../../utils/promiseAllInBatches'
 import {
     apiFetchEvents,
     apiFetchTrackedEntityInstances,
@@ -23,7 +24,7 @@ export const getDataSize = async ({
 }
 
 const getTEI = ({ dataEngine, programList, globalLimit, orgUnit }) => {
-    const teiPromises = []
+    const teiRequests = []
     const limitByProgram = globalLimit.settingDownload === 'PER_PROGRAM'
     orgUnit.map((ou) =>
         programList.map((program) => {
@@ -40,7 +41,7 @@ const getTEI = ({ dataEngine, programList, globalLimit, orgUnit }) => {
                           globalLimit.eventsDownload / programList.length
                       )
             }
-            teiPromises.push(
+            teiRequests.push(() =>
                 tei
                     ? apiFetchTrackedEntityInstances({
                           dataEngine,
@@ -58,5 +59,5 @@ const getTEI = ({ dataEngine, programList, globalLimit, orgUnit }) => {
         })
     )
 
-    return Promise.all(teiPromises)
+    return promiseAllInBatches(teiRequests, (request) => request())
 }

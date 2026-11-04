@@ -18,14 +18,22 @@ const ItemSelector = ({ selection }) => {
     const debouncedFilterText = useDebounce(filter, 350)
 
     useEffect(() => {
+        const controller = new AbortController()
         const query = getUserQuery(debouncedFilterText)
         dataEngine
-            .query({ items: query })
+            .query({ items: query }, { signal: controller.signal })
             .then((res) => {
-                setItems(res.items.users)
-                setError(false)
+                if (!controller.signal.aborted) {
+                    setItems(res.items.users)
+                    setError(false)
+                }
             })
-            .catch(() => setError(true))
+            .catch(() => {
+                if (!controller.signal.aborted) {
+                    setError(true)
+                }
+            })
+        return () => controller.abort()
     }, [debouncedFilterText])
 
     const closeMenu = () => {

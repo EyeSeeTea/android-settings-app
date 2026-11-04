@@ -5,8 +5,8 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
-"POT-Creation-Date: 2026-10-28T13:01:59.115Z\n"
-"PO-Revision-Date: 2026-10-28T13:01:59.115Z\n"
+"POT-Creation-Date: 2026-11-04T10:17:12.496Z\n"
+"PO-Revision-Date: 2026-11-04T10:17:12.496Z\n"
 
 msgid ""
 "The initial configuration of the app has been completed and it is now ready "
@@ -112,6 +112,12 @@ msgstr "Visualization title"
 
 msgid "This will override the visualization title when shown in the app"
 msgstr "This will override the visualization title when shown in the app"
+
+msgid "Error loading users"
+msgstr "Error loading users"
+
+msgid "Loading users..."
+msgstr "Loading users..."
 
 msgid "No user found"
 msgstr "No user found"

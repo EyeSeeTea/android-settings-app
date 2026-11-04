@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
 import React from 'react'
 import '@testing-library/jest-dom'
@@ -12,6 +12,16 @@ jest.mock('@dhis2/app-runtime', () => ({
 
 const openMenu = () =>
     userEvent.click(screen.getByPlaceholderText('Search by user'))
+
+const searchFor = (text) =>
+    userEvent.type(screen.getByPlaceholderText('Search by user'), text)
+
+const rejectWhenAborted = (_query, { signal }) =>
+    new Promise((_resolve, reject) => {
+        signal.addEventListener('abort', () =>
+            reject(new Error('Network error'))
+        )
+    })
 
 describe('ItemSelector', () => {
     beforeEach(() => {
@@ -60,5 +70,48 @@ describe('ItemSelector', () => {
             await screen.findByText('Error loading users')
         ).toBeInTheDocument()
         expect(screen.queryByText('Loading users...')).not.toBeInTheDocument()
+    })
+
+    it('cancels the previous request without showing an error', async () => {
+        mockQuery.mockImplementationOnce(rejectWhenAborted).mockResolvedValue({
+            items: { users: [{ id: 'user1', name: 'John Traore' }] },
+        })
+        render(<ItemSelector selection={jest.fn()} />)
+
+        await searchFor('John')
+
+        expect(await screen.findByText('John Traore')).toBeInTheDocument()
+        const [, firstRequestOptions] = mockQuery.mock.calls[0]
+        expect(firstRequestOptions.signal.aborted).toBe(true)
+        expect(
+            screen.queryByText('Error loading users')
+        ).not.toBeInTheDocument()
+    })
+
+    it('ignores a late response from a previous search', async () => {
+        let resolveFirstRequest
+        mockQuery
+            .mockImplementationOnce(
+                () =>
+                    new Promise((resolve) => {
+                        resolveFirstRequest = resolve
+                    })
+            )
+            .mockResolvedValue({
+                items: { users: [{ id: 'user1', name: 'John Traore' }] },
+            })
+        render(<ItemSelector selection={jest.fn()} />)
+
+        await searchFor('John')
+        expect(await screen.findByText('John Traore')).toBeInTheDocument()
+
+        await act(async () =>
+            resolveFirstRequest({
+                items: { users: [{ id: 'user2', name: 'Aminata Kamara' }] },
+            })
+        )
+
+        expect(screen.getByText('John Traore')).toBeInTheDocument()
+        expect(screen.queryByText('Aminata Kamara')).not.toBeInTheDocument()
     })
 })

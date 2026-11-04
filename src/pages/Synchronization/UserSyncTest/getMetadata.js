@@ -1,4 +1,6 @@
+import chunk from 'lodash/chunk'
 import { formatByteSize, getByteLength } from '../../../utils/getByteLength'
+import { promiseAllInBatches } from '../../../utils/promiseAllInBatches'
 import { joinElementsById, joinObjectsById } from './helper'
 import {
     apiFetchApps,
@@ -31,6 +33,8 @@ import {
     apiFetchTrackedEntityType,
     apiFetchUserSettings,
 } from './queries/metadataQueries'
+
+const DATA_ELEMENTS_PER_REQUEST = 100
 
 export const getMetadataSize = async ({
     dataEngine,
@@ -91,16 +95,11 @@ export const getMetadataSize = async ({
     return formatByteSize(metadataSize)
 }
 
-const fetchOrgUnits = (dataEngine, orgUnitList) => {
-    const orgUnitPromises = orgUnitList.map((ou) =>
-        apiFetchOrgUnit(dataEngine, ou)
-    )
-    return Promise.all(orgUnitPromises)
-}
+const fetchOrgUnits = (dataEngine, orgUnitList) =>
+    promiseAllInBatches(orgUnitList, (ou) => apiFetchOrgUnit(dataEngine, ou))
 
-const fetchDataElements = (dataEngine, dataElementList) => {
-    const dataElementPromises = dataElementList.map((e) =>
-        apiFetchDataElements(dataEngine, e)
+const fetchDataElements = (dataEngine, dataElementList) =>
+    promiseAllInBatches(
+        chunk(dataElementList, DATA_ELEMENTS_PER_REQUEST),
+        (dataElements) => apiFetchDataElements(dataEngine, dataElements)
     )
-    return Promise.all(dataElementPromises)
-}

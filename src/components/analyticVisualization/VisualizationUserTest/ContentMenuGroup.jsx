@@ -4,26 +4,41 @@ import PropTypes from 'prop-types'
 import React from 'react'
 import ContentMenuItem from './ContentMenuItem.jsx'
 
-const ContentMenuGroup = ({ items, addItem }) => (
-    <>
-        {isEmpty(items) && (
-            <ContentMenuItem name={i18n.t('No user found')} valid={false} />
-        )}
-
-        {items.map((item) => (
+const ContentMenuGroup = ({ items, loading, error, addItem }) => {
+    if (error) {
+        return (
             <ContentMenuItem
-                key={item.id || item.key}
-                addItem={addItem(item)}
-                name={item.name}
-                valid={true}
+                name={i18n.t('Error loading users')}
+                valid={false}
             />
-        ))}
-    </>
-)
+        )
+    }
+
+    if (loading) {
+        return (
+            <ContentMenuItem name={i18n.t('Loading users...')} valid={false} />
+        )
+    }
+
+    if (isEmpty(items)) {
+        return <ContentMenuItem name={i18n.t('No user found')} valid={false} />
+    }
+
+    return items.map((item) => (
+        <ContentMenuItem
+            key={item.id || item.key}
+            addItem={addItem(item)}
+            name={item.name}
+            valid={true}
+        />
+    ))
+}
 
 ContentMenuGroup.propTypes = {
-    items: PropTypes.array,
     addItem: PropTypes.func,
+    error: PropTypes.bool,
+    items: PropTypes.array,
+    loading: PropTypes.bool,
 }
 
 export default ContentMenuGroup

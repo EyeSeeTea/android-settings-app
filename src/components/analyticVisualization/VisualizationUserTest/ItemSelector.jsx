@@ -12,15 +12,20 @@ const ItemSelector = ({ selection }) => {
     const [isOpen, setIsOpen] = useState(false)
     const [filter, setFilter] = useState('')
     const [items, setItems] = useState(null)
+    const [error, setError] = useState(false)
     const [disableField, setDisableField] = useState(false)
     const dataEngine = useDataEngine()
     const debouncedFilterText = useDebounce(filter, 350)
 
     useEffect(() => {
         const query = getUserQuery(debouncedFilterText)
-        dataEngine.query({ items: query }).then((res) => {
-            setItems(res.items.users)
-        })
+        dataEngine
+            .query({ items: query })
+            .then((res) => {
+                setItems(res.items.users)
+                setError(false)
+            })
+            .catch(() => setError(true))
     }, [debouncedFilterText])
 
     const closeMenu = () => {
@@ -45,7 +50,14 @@ const ItemSelector = ({ selection }) => {
 
     const getMenus = () => {
         const displayItems = items?.slice(0, 5)
-        return <ContentMenuGroup items={displayItems} addItem={addItem} />
+        return (
+            <ContentMenuGroup
+                items={displayItems}
+                loading={items === null}
+                error={error}
+                addItem={addItem}
+            />
+        )
     }
 
     const updateFilter = ({ value }) => setFilter(value)
